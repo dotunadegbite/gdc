@@ -32,7 +32,6 @@ background: linear-gradient(to left, #bdc3c7 , #2c3e50); /* W3C, IE 10+/ Edge, F
   display: inline-block;
   position: relative;
   margin-bottom:2em;
-  max-height:200px;
 }
 .wrapper:after {
   padding-top: 56.25%;
@@ -41,7 +40,6 @@ background: linear-gradient(to left, #bdc3c7 , #2c3e50); /* W3C, IE 10+/ Edge, F
   content: '';
 }
 .game {
-	max-height: 300px;
   position: absolute;
   top: 0;
   bottom: 0;

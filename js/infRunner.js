@@ -1,7 +1,8 @@
 window.onload = function() {
 	var innerWidth = $('#game').width()//window.innerWidth;
 	var innerHeight = $('#game').height()//window.innerHeight;
-	var game = new Phaser.Game(innerWidth, innerHeight, Phaser.CANVAS,'game');
+	var gameRatio = innerWidth/innerHeight;	
+	var game = new Phaser.Game(Math.floor(480*gameRatio), 480, Phaser.CANVAS,'game');
 
 	//Setup
 	var ninja;
