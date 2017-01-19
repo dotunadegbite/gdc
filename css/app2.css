@@ -1,0 +1,77 @@
+body {
+
+background-color: : #ecf0f1;
+
+}
+#navbar{
+	background-color: #8e44ad !important;
+	min-height: 60px;
+  font-family: "Luckiest Guy";
+  font-size: x-large;
+  font-weight: normal;
+}
+
+
+@media (min-width: 768px) {
+  #navbar .navbar-brand {
+    line-height: 50px;
+  }
+  #navbar .navbar-nav > li > a {
+    line-height: 50px;
+  }
+}
+@media (max-width: 767px) {
+  #navbar .navbar-header {
+    padding: 15px 0;
+  }
+}
+
+.wrapper {
+	margin-top:2em;
+	left:20%;
+  width: 60%;
+  /* whatever width you want */
+  display: inline-block;
+  position: relative;
+  margin-bottom:2em;
+}
+.wrapper:after {
+  padding-top: 56.25%;
+  /* 16:9 ratio */
+  display: block;
+  content: '';
+}
+.game {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background-color: black;
+  color: white;
+}
+.center-panel{
+	left:20%;
+	width:60%;
+	display:inline-block;
+	position: relative;
+}
+.gradient{
+	color: whitesmoke;
+	display:inline-block;
+}
+a {
+	color:black !important;
+}
+#harvard{
+	display:inline-block;
+	max-width:80px;
+	max-height: 80px;
+}
+.harvardText{
+  font-family: "Luckiest Guy";
+  font-size: x-large;
+  font-weight: normal;
+  display:inline-block;
+  margin-left: 10px;
+}

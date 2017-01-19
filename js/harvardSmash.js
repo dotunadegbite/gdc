@@ -3,7 +3,7 @@
  	var innerWidth = $('#game').width();
  	var innerHeight = $('#game').height();
  	var gameRatio = innerWidth/innerHeight;
- 
+
  	var game = new Phaser.Game(Math.floor(480*gameRatio), 480, Phaser.CANVAS, 'game');
 
  	//Initialize the variables
@@ -19,8 +19,12 @@
  	var maxBlockGap = 10;
  	var playerJumping;
  	var playerFalling;
+  var numberOfBlocks;
+  var lastSeenBlock;
+  var newBlock;
+  var newBlock2;
 
- 	
+
  	//Establish the game
  	var play = function(game){}
 
@@ -28,26 +32,47 @@
  		preload:function(){
  			game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
  			game.load.image("player", "img/playerDefault.png");
- 			game.load.image("ground", "img/ground.png");
+ 			game.load.image("ground", "img/marioGround.png");
  			game.load.image("background", "img/background.png");
  			game.load.image("lava","img/lava.png");
+      game.load.image("cloud", "img/cloud.png");
  		},
- 		
+
 
  		create:function(){
  			/*playerJumping = false;
  			playerFalling = false;*/
  			score = 0;
- 			/*placedBlocks = 0;
+      cloud = game.add.sprite(200, 10,"cloud");
+ 			/*placedBlocks = 0; */
  			blockGroup = game.add.group();
  			topScore = localStorage.getItem("topHarvardSmasherScore")==null?0:localStorage.getItem("topHarvardSmasherScore");
  			scoreText = game.add.text(10,10,"-",{
  				font:"bold 16px Arial"
  			});
- 			updateScore();*/
+
+ 			updateScore();
  			game.stage.backgroundColor = "#87CEEB";
- 			/*game.physics.startSystem(Phaser.Physics.ARCADE);
- 			player = game.add.sprite(80,0,"player");
+ 			game.physics.startSystem(Phaser.Physics.ARCADE);
+
+      block = game.add.sprite(0,400, "ground");
+      block2 = game.add.sprite(block.width, 400,"ground");
+      blockGroup.add(block);
+      blockGroup.add(block2);
+
+
+
+      game.physics.arcade.enable(cloud);
+      game.physics.arcade.enable(blockGroup);
+
+      block.body.velocity.x = -70;
+      block2.body.velocity.x = -70;
+
+      game.camera.follow(blockGroup);
+      game.physics.arcade.enable(newBlock);
+
+
+      /*
  			player.anchor.set(0.5);
  			player.lastBlock = 1;
  			game.physics.arcade.enable(player);
@@ -65,6 +90,45 @@
  			game.physics.arcade.collide(player, lava);
  			if(player.y > lava.y)
  				die();*/
+      cloud.body.velocity.x = -20;
+      if(cloud.x < -100){
+        cloud = game.add.sprite(830,10,"cloud");
+        game.physics.arcade.enable(cloud);
+        console.log("works");
+      }
+
+      lastSeenBlock = blockGroup.children[blockGroup.length - 1];
+
+      if(lastSeenBlock.x < 250){
+         var randomizer = Math.floor(Math.random() * 10) + 1;
+         var previouseRandomizer;
+         console.log(randomizer);
+
+        if( randomizer < 7){
+        newBlock = game.add.sprite(lastSeenBlock.width + 700, 400, "ground");
+        newBlock2 = game.add.sprite(newBlock.width+1,400,"ground");
+        game.physics.arcade.enable(newBlock);
+        game.physics.arcade.enable(newBlock2);
+        newBlock.body.velocity.x = -70;
+        newBlock2.body.velocity.x = -70;
+        blockGroup.add(newBlock);
+        blockGroup.add(newBlock2);
+        previouseRandomizer = randomizer;
+      }
+
+      else if (randomizer > 7) {
+        newBlock = game.add.sprite(lastSeenBlock.width + 475, 400, "ground");
+        game.physics.arcade.enable(newBlock);
+        newBlock.body.velocity.x = -70;
+        blockGroup.add(newBlock);
+        previouseRandomizer = randomizer;
+      }
+
+      }
+
+
+
+
  		}
  	}
 
@@ -126,7 +190,7 @@
  					player.body.velocity.x = border*2;
  					player.body.veloctiy.y = -200;
  				}
- 				
+
  				var blockDiff = block.blockNumber - player.lastBlock;
  				if(blockDiff > 0){
  					score += Math.pow(2,blockDiff);
@@ -162,7 +226,3 @@
  			}
  		}
  	}
-
-
- 
- 	
