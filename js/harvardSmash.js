@@ -23,8 +23,11 @@
   var lastSeenBlock;
   var newBlock;
   var newBlock2;
-  var harvardPeople;
+  var harvardGroup;
   var harvardStudent;
+  var lastHarvardStudent;
+
+
 
 
  	//Establish the game
@@ -33,7 +36,7 @@
  	play.prototype = {
  		preload:function(){
  			game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
- 			game.load.image("player", "img/playerDefault.png");
+ 			game.load.image("player", "img/ninja.png");
  			game.load.image("ground", "img/marioGround.png");
  			game.load.image("background", "img/background.png");
  			game.load.image("lava","img/lava.png");
@@ -47,7 +50,11 @@
  			score = 0;
       cloud = game.add.sprite(200, 10,"cloud");
 
+
+
+
  			blockGroup = game.add.group();
+      harvardGroup = game.add.group();
  			topScore = localStorage.getItem("topHarvardSmasherScore")==null?0:localStorage.getItem("topHarvardSmasherScore");
  			scoreText = game.add.text(10,10,"-",{
  				font:"bold 16px Arial"
@@ -57,35 +64,50 @@
  			game.stage.backgroundColor = "#87CEEB";
  			game.physics.startSystem(Phaser.Physics.ARCADE);
 
+      player = game.add.sprite(75,365,"player");
+      game.physics.arcade.enable(player);
+      player.body.gravity.y = 300;
+      player.body.collideWorldBounds = true;
+
+
       block = game.add.sprite(0,400, "ground");
       block2 = game.add.sprite(block.width, 400,"ground");
+      block3 = game.add.sprite(block2.width + 100, 400, "ground");
+
+
+
+
       blockGroup.add(block);
       blockGroup.add(block2);
+      blockGroup.add(block3);
+
+      student = game.add.sprite(200,355,"harvardKid");
+      student2 = game.add.sprite(600,355,"harvardKid");
+      student.scale.setTo(1.5);
+      student2.scale.setTo(1.5);
+      harvardGroup.add(student);
+      harvardGroup.add(student2);
 
 
 
       game.physics.arcade.enable(cloud);
       game.physics.arcade.enable(blockGroup);
+      game.physics.arcade.enable(harvardGroup);
 
       block.body.velocity.x = -70;
       block2.body.velocity.x = -70;
+      block3.body.velocity.x = -70;
 
-      game.camera.follow(blockGroup);
+      block.body.immovable = true;
+      block2.body.immovable = true;
+      block3.body.immovable = true;
+
+      student.body.velocity.x = -100;
+      student2.body.velocity.x = -100;
+
+
+      game.camera.follow(player);
       game.physics.arcade.enable(newBlock);
-
-      harvardPeople = game.add.group();
-      harvardPeople.enableBody = true;
-      harvardPeople.physicsBodyType = Phaser.Physics.ARCADE;
-
-
-      harvardStudent = game.add.sprite(0, 0, "harvardKid");
-      harvardPeople.add(harvardStudent);
-      harvardStudent.body.velocity.x = -70;
-
-
-
-
-
 
  		},
 
@@ -93,6 +115,13 @@
     {
 
       cloud.body.velocity.x = -20;
+      player.body.velocity.x = 70;
+
+      if(playerJumping)
+      {
+        player.body.velocity.x = 0;
+      }
+
       if(cloud.x < -100){
         cloud = game.add.sprite(830,10,"cloud");
         game.physics.arcade.enable(cloud);
@@ -100,6 +129,7 @@
       }
 
       lastSeenBlock = blockGroup.children[blockGroup.length - 1];
+      lastHarvardStudent = harvardGroup.children[harvardGroup.length - 1];
 
       if(lastSeenBlock.x < 700)
       {
@@ -107,9 +137,33 @@
         game.physics.arcade.enable(newBlock);
         newBlock.body.velocity.x = -70;
         blockGroup.add(newBlock);
+        newBlock.body.immovable = true;
       }
 
-      //spawnHarvard();
+      if(lastHarvardStudent.x < 400)
+      {
+        newStudent = game.add.sprite(lastSeenBlock.width + 475, 355, "harvardKid");
+        game.physics.arcade.enable(newStudent);
+        newStudent.body.velocity.x = -100;
+        harvardGroup.add(newStudent);
+        newStudent.scale.setTo(1.5);
+      }
+
+      if(game.physics.arcade.collide(player, harvardGroup, collisionCheck)){
+        console.log("oh shieet");
+      }
+      if(game.physics.arcade.collide(player,blockGroup))
+      {
+        playerJumping = false;
+      }
+
+      //Jumps if there is a left click on mouse
+      if(game.input.activePointer.isDown && !playerJumping)
+      {
+        player.body.velocity.y = -250;
+        playerJumping = true;
+      }
+
  		}
  	}
 
@@ -121,37 +175,21 @@ function updateScore()
   scoreText.text = "Score: " + score + "\nBest: " + topScore;
 }
 
-function spawnHarvard()
+function collisionCheck(player, harvard)
 {
-  console.log("true");
-  for(var x = 0; x < 10; x++)
-    {
-    harvardStudent = game.add.sprite(x * 48, 432, 'harvardKid');
-    harvardPeople.add(harvardStudent);
-    harvardStudent.body.immovable = true;
-    }
+  if(harvard.body.touching.left){
+    player.kill();
+  }
+  else if(player.y  > harvard.y){
+    score += 1;
+    updateScore();
+    harvard.kill();
+  }
 
-    }
-
-
-Block = function(game, x, y)
-{
- 	Phaser.Sprite.call(this, game,x,y,"pole");
- 	game.physics.enable(this, Phaser.Physics.ARCADE);
- 	this.body.immovable = true;
- 	this.blockNumber = placedBlocks;
-};
-
-
-Block.prototype = Object.create(Phaser.Sprite.prototype);
-Block.prototype.constructor = Block;
-Block.prototype.update = function()
-{
-  this.body.velocity.x = 10;
- 	if(this.x < -this.width)
-  {
- 		this.destroy();
- 		addNewBlocks();
- 	}
 }
+
+function die(){
+		localStorage.setItem("topFlappyScore",Math.max(score,topScore));
+		game.state.start("Play");
+	}
 }
